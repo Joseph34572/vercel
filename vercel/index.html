@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NFC Reader</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 2rem; }
+    button { padding: 1rem 2rem; font-size: 1.2rem; }
+    #uid { margin-top: 2rem; font-size: 1.5rem; color: green; }
+  </style>
+</head>
+<body>
+  <h1>Read NFC UID</h1>
+  <button id="readNfcBtn">Scan NFC Card</button>
+  <div id="uid"></div>
+
+  <script>
+    const readNfcBtn = document.getElementById('readNfcBtn');
+    const uidDisplay = document.getElementById('uid');
+
+    readNfcBtn.addEventListener('click', async () => {
+      if ('NDEFReader' in window) {
+        try {
+          const ndef = new NDEFReader();
+          await ndef.scan();
+          uidDisplay.textContent = "Scan started...";
+
+          ndef.onreading = event => {
+            const uid = event.serialNumber || "UID not available";
+            uidDisplay.textContent = "Card UID: " + uid;
+          };
+
+          ndef.onerror = () => {
+            uidDisplay.textContent = "Error reading NFC card.";
+          };
+        } catch (err) {
+          uidDisplay.textContent = "Error: " + err.message;
+        }
+      } else {
+        uidDisplay.textContent = "Web NFC not supported on this device.";
+      }
+    });
+  </script>
+</body>
+</html>
